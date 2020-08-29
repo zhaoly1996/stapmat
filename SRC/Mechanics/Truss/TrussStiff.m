@@ -44,9 +44,6 @@ end
 % Assemble structure stiffness matrix
 Assemble();
 
-
-
-
 end
 
 % ----------------------- Functions -----------------------------------
@@ -65,10 +62,11 @@ global sdata;
 global cdata;
 S = zeros(6, 6, 'double');
 ST = zeros(6, 1, 'double');
-sdata.STIFF = zeros(sdata.NWK, 1, 'double');
+STIFF = zeros(sdata.NWK, 1, 'double');
 
 NUME = sdata.NUME; MATP = sdata.MATP; XYZ = sdata.XYZ; 
 E = sdata.E; AREA = sdata.AREA; LM = sdata.LM;
+MAXA = sdata.MAXA;
 for N = 1:NUME
     MTYPE = MATP(N);
     
@@ -94,10 +92,10 @@ for N = 1:NUME
     end
     
 %   SRC/Mechanics/ADDBAN.m
-    ADDBAN(S, LM(:, N));
+    STIFF = ADDBAN(S, LM(:, N), STIFF, MAXA);
     
 end
-
+sdata.STIFF = STIFF;
 % The third time stamp
 cdata.TIM(3, :) = clock;
 

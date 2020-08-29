@@ -59,21 +59,19 @@ end
 % Write the load vector
 % Only the first load vector
 fprintf(IOUT, '\n\n L O A D   C A S E   D A T A\n');
-LL = cdata.LL; NLOAD = cdata.NLOAD;
+NLOAD = sdata.NLOAD;
 NOD = sdata.NOD; IDIRN = sdata.IDIRN; FLOAD = sdata.FLOAD;
-for I = 1:1 %cdata.NLCASE
-    fprintf(IOUT, '\n     LOAD CASE NUMBER . . . . . . . = %10d\n', LL);
-    fprintf(IOUT, '     NUMBER OF CONCENTRATED LOADS . = %10d\n', NLOAD);
-    
-    if (LL ~= I)
-        error(' *** ERROR *** LOAD CASES ARE NOT IN ORDER');
-    end
+Count = 0;
+for I = 1:cdata.NLCASE
+    fprintf(IOUT, '\n     LOAD CASE NUMBER . . . . . . . = %10d\n', I);
+    fprintf(IOUT, '     NUMBER OF CONCENTRATED LOADS . = %10d\n', NLOAD(I));
     fprintf(IOUT, '\n\n        NODE       DIRECTION      LOAD\n');
     fprintf(IOUT, '       NUMBER                   MAGNITUDE\n');
     
-    for N = 1:NLOAD(I)
+    for N = 1+Count:NLOAD(I)+Count
         fprintf(IOUT,'%10d         %4d       %12.5e',...
             NOD(N), IDIRN(N), FLOAD(N));
     end
+    Count = Count + NLOAD(I);
 end
 end

@@ -42,31 +42,33 @@ IIN = cdata.IIN;
 cdata.HED = fgetl(IIN);
 
 tmp = str2num(fgetl(IIN));
-cdata.NUMNP = int64(tmp(1));
-cdata.NUMEG = int64(tmp(2));
-cdata.NLCASE = int64(tmp(3));
-cdata.MODEX = int64(tmp(4));
+cdata.NUMNP = round(tmp(1));
+cdata.NUMEG = round(tmp(2));
+cdata.NLCASE = round(tmp(3));
+cdata.MODEX = round(tmp(4));
 
 if (cdata.NUMNP == 0) return; end
 
 %% Read nodal point data
-InitBasicData();
+NUMNP = cdata.NUMNP;
+% Init basic data
+cdata.NPAR = zeros(10, 1, 'int64');
+ID = zeros(3,NUMNP, 'int64');
+X = zeros(NUMNP, 1, 'double');
+Y = zeros(NUMNP, 1, 'double');
+Z = zeros(NUMNP, 1, 'double');
 % Define local variables to speed
-ID = sdata.ID; X = sdata.X; Y = sdata.Y; Z = sdata.Z;
-for i = 1:cdata.NUMNP
-    tmp = str2num(fgetl(IIN));
-    ID(1, i) = int64(tmp(2));
-    ID(2, i) = int64(tmp(3));
-    ID(3, i) = int64(tmp(4));
-    X(i) = double(tmp(5));
-    Y(i) = double(tmp(6));
-    Z(i) = double(tmp(7));
+for i = 1:NUMNP
+    tmp = sscanf(fgetl(IIN), '%d %d %d %d %f %f %f');
+    ID(:, i) = tmp(2:4);
+    X(i) = tmp(5);
+    Y(i) = tmp(6);
+    Z(i) = tmp(7);
 end
-sdata.ID = ID; sdata.X = X; sdata.Y = Y; sdata.Z = Z;
+sdata.IDOrigin = ID; sdata.X = X; sdata.Y = Y; sdata.Z = Z;
 %% Compute the number of equations
-sdata.IDOrigin = ID;
 NEQ = 0;
-for N=1:cdata.NUMNP
+for N=1:NUMNP
     for I=1:3
         if (ID(I,N) == 0)
             NEQ = NEQ + 1;
@@ -81,50 +83,38 @@ sdata.NEQ = NEQ;
 %% Read load data
 % Init control data
 NLCASE = cdata.NLCASE;
-sdata.R = zeros(NEQ, NLCASE, 'double');
-R = sdata.R;
+R = zeros(NEQ, NLCASE, 'double');
+NLOAD = zeros(NLCASE, 1, 'double');
+NOD = zeros(NLCASE*NUMNP, 1, 'double');
+IDIRN = zeros(NLCASE*NUMNP, 1, 'double');
+FLOAD = zeros(NLCASE*NUMNP, 1, 'double');
+
 % Read data
-for N = 1:cdata.NLCASE
-    tmp = str2num(fgetl(IIN));
-    cdata.LL = int64(tmp(1)); cdata.NLOAD = int64(tmp(2));
-    NLOAD = cdata.NLOAD;
-%   Init load data
-    sdata.NOD = zeros(NLOAD, 1, 'int64');
-    sdata.IDIRN = zeros(NLOAD, 1, 'int64');
-    sdata.FLOAD = zeros(NLOAD, 1, 'double');
-    NOD = sdata.NOD; IDIRN = sdata.IDIRN; FLOAD = sdata.FLOAD;
+Count = 0;
+for N = 1:NLCASE
+    tmp = sscanf(fgetl(IIN), '%d %d');
+    NNLOAD = tmp(2);
+    NLOAD(N) = tmp(2);
     
 %   Read load data
-    for I = 1:NLOAD
-        tmp = str2num(fgetl(IIN));
-        NOD(I) = int64(tmp(1));
-        IDIRN(I) = int64(tmp(2));
-        FLOAD(I) = double(tmp(3));
+    for I = 1+Count:NNLOAD+Count
+        tmp = sscanf(fgetl(IIN), '%d %d %f');
+        NOD(I) = tmp(1);
+        IDIRN(I) = tmp(2);
+        FLOAD(I) = tmp(3);
     end
-    if (cdata.MODEX == 0) return; end
     
 %   Compute load vector
-    for L = 1:NLOAD
-        II = ID(IDIRN(L), NOD(L));
-        if (II > 0) R(II, N) = R(II, N) + FLOAD(L); end
+    for L = 1+Count:NNLOAD+Count
+       II = ID(IDIRN(L), NOD(L));
+       if (II > 0) R(II, N) = R(II, N) + FLOAD(L); end
     end
-    sdata.NOD = NOD; sdata.IDIRN = IDIRN; sdata.FLOAD = FLOAD; sdata.R = R;
+    Count = Count + NNLOAD;
 end
-
-end
-
-%% Functions
-
-
-% InitBasicData
-function InitBasicData()
-global cdata;
-global sdata;
-
-cdata.NPAR = zeros(10, 1, 'int64');
-
-sdata.ID = zeros(3,cdata.NUMNP, 'int64');
-sdata.X = zeros(cdata.NUMNP, 1, 'double');
-sdata.Y = zeros(cdata.NUMNP, 1, 'double');
-sdata.Z = zeros(cdata.NUMNP, 1, 'double');
+if (cdata.MODEX == 0) return; end
+NOD = NOD(1:Count);
+IDIRN = IDIRN(1:Count);
+FLOAD = FLOAD(1:Count);
+sdata.NOD = NOD; sdata.IDIRN = IDIRN; sdata.FLOAD = FLOAD;
+sdata.R = R; sdata.NLOAD = NLOAD;
 end

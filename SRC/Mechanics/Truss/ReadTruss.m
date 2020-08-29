@@ -84,18 +84,17 @@ fprintf(IOUT, '      NUMBER-N           I             J       SET NUMBER\n');
 
 % Get Position data
 NUME = cdata.NPAR(2);
-sdata.XYZ = zeros(6, NUME, 'double');
-sdata.MATP = zeros(NUME, 1, 'int64');                 % the type of material
-sdata.LM = zeros(6, NUME, 'double');                  % connectivity matrix
-sdata.MHT = zeros(sdata.NEQ, 1, 'int64');
+XYZ = zeros(6, NUME, 'double');
+MATP = zeros(NUME, 1, 'double');                 % the type of material
+LM = zeros(6, NUME, 'double');                  % connectivity matrix
+MHT = zeros(sdata.NEQ, 1, 'double');
 X = sdata.X; Y = sdata.Y; Z = sdata.Z; ID = sdata.ID;
-XYZ = sdata.XYZ; MATP = sdata.MATP; LM = sdata.LM;
 
 for N = 1:NUME
-    tmp = str2num(fgetl(IIN));
-    I = round(tmp(2));
-    J = round(tmp(3));
-    MTYPE = round(tmp(4));
+    tmp = sscanf(fgetl(IIN), '%d %d %d %d');
+    I = tmp(2);
+    J = tmp(3);
+    MTYPE = tmp(4);
     
 %   Save element information
     XYZ(1, N) = X(I);
@@ -109,17 +108,14 @@ for N = 1:NUME
     fprintf(IOUT, '%10d      %10d    %10d       %5d\n', N, I, J, MTYPE);
 
 %   Compute connectivity matrix
-    LM(1, N) = ID(1, I);
-    LM(4, N) = ID(1, J);
-    LM(2, N) = ID(2, I);
-    LM(5, N) = ID(2, J);
-    LM(3, N) = ID(3, I);
-    LM(6, N) = ID(3, J);
+    LM(1:3, N) = ID(:, I);
+    LM(4:6, N) = ID(:, J);
 
 %   Updata column heights and bandwidth
-    ColHt(LM(:, N))
+    MHT = ColHt(LM(:, N), MHT);
 end
 sdata.XYZ = XYZ; sdata.MATP = MATP; sdata.LM = LM;
+sdata.MHT = MHT;
 
 % Clear the memory of X, Y, Z
 sdata.X = double(0);

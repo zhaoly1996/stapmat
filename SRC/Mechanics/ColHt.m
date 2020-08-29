@@ -18,21 +18,16 @@
 %*                                                                 *
 %* *****************************************************************
 
-function ColHt(LM)
+function MHT = ColHt(LM, MHT)
 
 % Get global data
-global sdata;
-MHT = sdata.MHT;
 LS = min(LM(LM ~= 0));
-ND = sdata.NDOF * sdata.NNODE;
-for I = 1:ND
+for I = 1:length(LM)
     II = LM(I);
     if (II ~= 0)
         ME = II - LS;
         if (ME > MHT(II)) MHT(II) = ME; end
     end
 end
-
-sdata.MHT = MHT;
 
 end

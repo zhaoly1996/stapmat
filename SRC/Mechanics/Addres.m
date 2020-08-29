@@ -26,8 +26,7 @@ global sdata;
 global cdata;
 
 NEQ = sdata.NEQ; MHT = sdata.MHT;
-sdata.MAXA = zeros(NEQ+1, 1, 'int64');
-MAXA = sdata.MAXA;
+MAXA = zeros(NEQ+1, 1, 'double');
 
 MAXA(1) = 1;
 MAXA(2) = 2;

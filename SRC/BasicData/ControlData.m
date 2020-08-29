@@ -23,8 +23,6 @@ classdef ControlData
                        %             and cross-sectional constants
         NUMEG;         % Total number of element groups, > 0
         NLCASE;        % Number of load case (>0)
-        LL;            % Load case number
-        NLOAD;         % The number of concentrated loads applied in this load case
 
         MODEX;         % Solution mode: 0 - data check only; 1 - execution
 

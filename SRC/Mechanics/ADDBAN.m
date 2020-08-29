@@ -18,14 +18,9 @@
 %*                                                                 *
 %* *****************************************************************
 
-function ADDBAN(S, LM)
+function STIFF = ADDBAN(S, LM, STIFF, MAXA)
 
-% Get global data
-global sdata;
-MAXA = sdata.MAXA; 
-STIFF = sdata.STIFF;
-ND = sdata.NDOF * sdata.NNODE;
-for J = 1:ND
+for J = 1:length(LM)
     JJ = LM(J);
     if (JJ > 0)
         for I = 1:J
@@ -38,7 +33,5 @@ for J = 1:ND
         end
     end
 end
-
-sdata.STIFF = STIFF;
 
 end

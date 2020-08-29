@@ -30,14 +30,13 @@ classdef SolutionData
         Y;        % double, Y(NUMNP), Y coordinates
         Z;        % double, Z(NUMNP), Z coordinates
         R;        % double, R(NEQ), Load vector
-        NOD;      % int, NOD(NLOAD), Node number to which this load is applied (1~NUMNP)
-        IDIRN;    % int, IDIRN(NLOAD), Degree of freedom number for this load component
+        NLOAD;    % int, NLOAD(NLCASE), The number of concentrated loads applied in this load case
+        NOD;      % int, NOD(NLOAD_FULL), Node number to which this load is applied
+        IDIRN;    % int, IDIRN(NLOAD_FULL), Degree of freedom number for this load component
                   %                     1 : X-direction;
                   %                     2 : Y-direction;
                   %                     3 : Z-direction;
-        FLOAD;    % double, FLOAD(NLOAD), Magnitude of load
-
-        
+        FLOAD;    % double, FLOAD(NLOAD_FULL), Magnitude of load
         
         % Element data
         NUME;     % int, number of elements
@@ -65,6 +64,7 @@ classdef SolutionData
         LM;       % int, LM(6, NUME), Connectivity matrix
         MAXA;     % int, MAXA(NEQ)
         STIFF;    % double ,STIFF(NWK), store the elements of stiffness matrix
+        B;        % double, B(24,NUME), Strain matrix
         
         % Result data
         DIS;      % double, DIS(NEQ, NLCASE), Displacement of nodes

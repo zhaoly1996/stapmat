@@ -41,8 +41,12 @@ for N = 1:cdata.NUMEG
 
 %   Different kinds of element
     NPAR1 = cdata.NPAR(1);
-    if (NPAR1 == 1) TrussStiff()
-    else error(' *** ERROR *** No Such Element'); end
+    switch NPAR1
+        case 1 
+            TrussStiff();
+        otherwise
+            error(' *** ERROR *** No Such Element');
+    end
     
 end
 

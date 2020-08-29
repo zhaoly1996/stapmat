@@ -32,6 +32,7 @@ fprintf(IOUT, ['\n\n  S T R E S S  C A L C U L A T I O N S  F O R  ' ...
     '       ELEMENT             FORCE            STRESS\n' ...
     '       NUMBER\n'], NG);
 
+ST = zeros(6, 1);
 for N = 1:NUME
     MTYPE = MATP(N);
    
@@ -47,7 +48,6 @@ for N = 1:NUME
     ST(4) = -ST(1); ST(5) = -ST(2); ST(6) = -ST(3);
     
     STR = 0.0;
-    
     if (LM(1, N) > 0) STR = STR + ST(1)*U(LM(1, N)); end
     if (LM(2, N) > 0) STR = STR + ST(2)*U(LM(2, N)); end
     if (LM(3, N) > 0) STR = STR + ST(3)*U(LM(3, N)); end
